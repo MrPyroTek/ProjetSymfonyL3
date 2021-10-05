@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -51,6 +53,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="integer", nullable=true)
      */
     private $PhoneNumber;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ContactTicket::class, mappedBy="author_id")
+     */
+    private $contactTickets;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ContactTicket::class, mappedBy="admin_id")
+     */
+    private $adminTickets;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="author")
+     */
+    private $posts;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Orders::class, mappedBy="user")
+     */
+    private $orders;
+
+    public function __construct()
+    {
+        $this->contactTickets = new ArrayCollection();
+        $this->adminTickets = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        $this->orders = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -173,6 +203,126 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhoneNumber(?int $PhoneNumber): self
     {
         $this->PhoneNumber = $PhoneNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ContactTicket[]
+     */
+    public function getContactTickets(): Collection
+    {
+        return $this->contactTickets;
+    }
+
+    public function addContactTicket(ContactTicket $contactTicket): self
+    {
+        if (!$this->contactTickets->contains($contactTicket)) {
+            $this->contactTickets[] = $contactTicket;
+            $contactTicket->setAuthorId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactTicket(ContactTicket $contactTicket): self
+    {
+        if ($this->contactTickets->removeElement($contactTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($contactTicket->getAuthorId() === $this) {
+                $contactTicket->setAuthorId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ContactTicket[]
+     */
+    public function getAdminTickets(): Collection
+    {
+        return $this->adminTickets;
+    }
+
+    public function addAdminTicket(ContactTicket $adminTicket): self
+    {
+        if (!$this->adminTickets->contains($adminTicket)) {
+            $this->adminTickets[] = $adminTicket;
+            $adminTicket->setAdminId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdminTicket(ContactTicket $adminTicket): self
+    {
+        if ($this->adminTickets->removeElement($adminTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($adminTicket->getAdminId() === $this) {
+                $adminTicket->setAdminId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Post[]
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): self
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts[] = $post;
+            $post->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): self
+    {
+        if ($this->posts->removeElement($post)) {
+            // set the owning side to null (unless already changed)
+            if ($post->getAuthor() === $this) {
+                $post->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Orders[]
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Orders $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders[] = $order;
+            $order->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Orders $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getUser() === $this) {
+                $order->setUser(null);
+            }
+        }
 
         return $this;
     }
