@@ -44,13 +44,13 @@ class Orders
     private $city;
 
     /**
-     * @ORM\ManyToOne(targetEntity=product::class)
+     * @ORM\ManyToOne(targetEntity=Product::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity=statekeys::class)
+     * @ORM\ManyToOne(targetEntity=StateKeys::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $state;
